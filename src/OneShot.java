@@ -1,31 +1,18 @@
 
 public class OneShot {
+	//public static int[] numResources = {8, 7, 8};
 	public static void main(String[] args) {
 		int[] numResources = {8,7,8};
 		
-		Process p1 = new Process(3,6,7,10);
-		Process p2 = new Process(1,5,6,3);
-		Process p3 = new Process(8,1,2,3);
-		Process p4 = new Process(6,3,3,6);
-		Process p5 = new Process(2,1,5,6);
-		
+		MultithreadProcess p1 = new MultithreadProcess("p1", 3, 6, 7, 10, numResources);
 		p1.start();
+		MultithreadProcess p2 = new MultithreadProcess("p2", 1, 5, 6, 3, numResources);
 		p2.start();
-		
-		
-//		while(true) {
-//			try {
-//				System.out.println("Current Available Resources: ");
-//				System.out.println(numResources[0] + " " + numResources[1] + " " + numResources[2]);
-//				p1.oneShot(numResources);
-//				p2.oneShot(numResources);
-//				p3.oneShot(numResources);
-//				p4.oneShot(numResources);
-//				p5.oneShot(numResources);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//		}
+		MultithreadProcess p3 = new MultithreadProcess("p3", 4, 2, 2, 5, numResources);
+		p3.start();
+		MultithreadProcess p4 = new MultithreadProcess("p4", 6, 3, 3, 6, numResources);
+		p4.start();
+		MultithreadProcess p5 = new MultithreadProcess("p5", 2, 1, 5, 8, numResources);
+		p5.start();
 	}
 }
