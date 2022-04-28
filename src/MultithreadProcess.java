@@ -188,8 +188,8 @@ public class MultithreadProcess extends Thread {
 				setStatus(2);
 			}
 			else if (getStatus() == 2 && 
-					(numResources[0] < getRequiredResourceA() - getCurrentResourceA() ||
-					 numResources[1] < getRequiredResourceB() - getCurrentResourceB() ||
+					(numResources[0] < getRequiredResourceA() - getCurrentResourceA() &&
+					 numResources[1] < getRequiredResourceB() - getCurrentResourceB() &&
 					 numResources[2] < getRequiredResourceC() - getCurrentResourceC())) {
 				numResources[0] += getCurrentResourceA();
 				numResources[1] += getCurrentResourceB();
