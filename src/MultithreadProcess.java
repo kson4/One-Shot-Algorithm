@@ -93,6 +93,7 @@ public class MultithreadProcess extends Thread {
 	public void setStatus(int status) {
 		// 0 is waiting
 		// 1 is running
+		// 2 is requesting
 		this.status = status;
 	}
 	
@@ -106,6 +107,9 @@ public class MultithreadProcess extends Thread {
 		}
 		else if (getStatus() == 1) {
 			System.out.println(_getName() + " Status: Running");
+		}
+		else if (getStatus() == 2) {
+			System.out.println(_getName() + " Status: Holding Resources~");
 		}
 	}
 	
@@ -124,34 +128,77 @@ public class MultithreadProcess extends Thread {
 			if (numResources[0] >= getRequiredResourceA() &&
 				numResources[1] >= getRequiredResourceB() &&
 				numResources[2] >= getRequiredResourceC()) {
-					//System.out.println(_getName() + " is running.");
-					//System.out.println("Resources left: " + numResources[0] + " " + numResources[1] + 
-					//		" " + numResources[2]);
 				
-					numResources[0] -= getRequiredResourceA();
-					numResources[1] -= getRequiredResourceB();
-					numResources[2] -= getRequiredResourceC();
-					setStatus(1);
-					setCurrentResourceA(getRequiredResourceA());
-					setCurrentResourceB(getRequiredResourceB());
-					setCurrentResourceC(getRequiredResourceC());
-					try {
-						Thread.sleep(1000 * getBurstTime());
-					} catch (InterruptedException e) {
-					}
-					//System.out.println(_getName() + " is finished. Returning resources.");
-					//System.out.println("Resources: " + numResources[0] + " " + numResources[1] + 
-					//		" " + numResources[2]);
-					numResources[0] += getRequiredResourceA();
-					numResources[1] += getRequiredResourceB();
-					numResources[2] += getRequiredResourceC();
-					setCurrentResourceA(0);
-					setCurrentResourceB(0);
-					setCurrentResourceC(0);
-					setCurrentResourceA(0);
-					setCurrentResourceB(0);
-					setCurrentResourceC(0);
+				//System.out.println(_getName() + " is running.");
+				//System.out.println("Resources left: " + numResources[0] + " " + numResources[1] + 
+				//		" " + numResources[2]);
+			
+				numResources[0] -= getRequiredResourceA();
+				numResources[1] -= getRequiredResourceB();
+				numResources[2] -= getRequiredResourceC();
+				setStatus(1);
+				setCurrentResourceA(getRequiredResourceA());
+				setCurrentResourceB(getRequiredResourceB());
+				setCurrentResourceC(getRequiredResourceC());
+				try {
+					Thread.sleep(1000 * getBurstTime());
+				} catch (InterruptedException e) {
 				}
+				//System.out.println(_getName() + " is finished. Returning resources.");
+				//System.out.println("Resources: " + numResources[0] + " " + numResources[1] + 
+				//		" " + numResources[2]);
+				numResources[0] += getRequiredResourceA();
+				numResources[1] += getRequiredResourceB();
+				numResources[2] += getRequiredResourceC();
+				setCurrentResourceA(0);
+				setCurrentResourceB(0);
+				setCurrentResourceC(0);
+				setCurrentResourceA(0);
+				setCurrentResourceB(0);
+				setCurrentResourceC(0);
+				setStatus(0);
+			}
+			else if (getStatus() == 0) {
+				if (numResources[0] >= getRequiredResourceA()) {
+					numResources[0] -= getRequiredResourceA();
+					setCurrentResourceA(getRequiredResourceA());
+				}
+				else {
+					setCurrentResourceA(numResources[0]);
+					numResources[0] = 0;
+				}
+				
+				if (numResources[1] >= getRequiredResourceB()) {
+					numResources[1] -= getRequiredResourceB();
+					setCurrentResourceB(getRequiredResourceB());
+				}
+				else {
+					setCurrentResourceB(numResources[1]);
+					numResources[1] = 0;
+				}
+				
+				if (numResources[2] >= getRequiredResourceC()) {
+					numResources[2] -= getRequiredResourceC();
+					setCurrentResourceC(getRequiredResourceC());
+				}
+				else {
+					setCurrentResourceC(numResources[2]);
+					numResources[2] = 0;
+				}
+				setStatus(2);
+			}
+			else if (getStatus() == 2 && 
+					(numResources[0] < getRequiredResourceA() - getCurrentResourceA() ||
+					 numResources[1] < getRequiredResourceB() - getCurrentResourceB() ||
+					 numResources[2] < getRequiredResourceC() - getCurrentResourceC())) {
+				numResources[0] += getCurrentResourceA();
+				numResources[1] += getCurrentResourceB();
+				numResources[2] += getCurrentResourceC();
+				setCurrentResourceA(0);
+				setCurrentResourceB(0);
+				setCurrentResourceC(0);
+				setStatus(0);
+			}
 //				else {
 //					System.out.println(_getName() + " is currently waiting for resources.");
 //				}
