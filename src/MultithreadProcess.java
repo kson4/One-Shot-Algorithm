@@ -5,7 +5,11 @@ public class MultithreadProcess extends Thread {
 	private int requiredResourceA;
 	private int requiredResourceB;
 	private int requiredResourceC;
+	private int currentResourceA;
+	private int currentResourceB;
+	private int currentResourceC;
 	private int burstTime;
+	private int status;
 	private int[] numResources;
 	
 	public MultithreadProcess(String name, int requiredResourceA, int requiredResourceB, 
@@ -14,7 +18,11 @@ public class MultithreadProcess extends Thread {
 		this.requiredResourceA = requiredResourceA;
 		this.requiredResourceB = requiredResourceB;
 		this.requiredResourceC = requiredResourceC;
+		this.currentResourceA = 0;
+		this.currentResourceB = 0;
+		this.currentResourceC = 0;
 		this.burstTime = burstTime;
+		this.status = 0;
 		this.numResources = numResources;
 	}
 
@@ -30,8 +38,24 @@ public class MultithreadProcess extends Thread {
 		return requiredResourceC;
 	}
 	
+	public int getCurrentResourceA() {
+		return currentResourceA;
+	}
+	
+	public int getCurrentResourceB() {
+		return currentResourceB;
+	}
+	
+	public int getCurrentResourceC() {
+		return currentResourceC;
+	}
+	
 	public int getBurstTime() {
 		return burstTime;
+	}
+	
+	public int getStatus() {
+		return status;
 	}
 	
 	public String _getName() {
@@ -50,8 +74,24 @@ public class MultithreadProcess extends Thread {
 		this.requiredResourceC = requiredResourceC;
 	}
 	
+	public void setCurrentResourceA(int currentResourceA) {
+		this.currentResourceA = requiredResourceA;
+	}
+	
+	public void setCurrentResourceB(int currentResourceB) {
+		this.currentResourceB = requiredResourceB;
+	}
+	
+	public void setCurrentResourceC(int currentResourceC) {
+		this.currentResourceC = requiredResourceC;
+	}
+	
 	public void setBurstTime(int burstTime) {
 		this.burstTime = burstTime;
+	}
+	
+	public void setStatus(int status) {
+		this.status = status;
 	}
 	
 	public void _setName(String name) {
@@ -66,33 +106,39 @@ public class MultithreadProcess extends Thread {
 			e.printStackTrace();
 		}
 		while(true) {
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+			}
 			if (numResources[0] >= getRequiredResourceA() &&
 				numResources[1] >= getRequiredResourceB() &&
 				numResources[2] >= getRequiredResourceC()) {
-					System.out.println(_getName() + " is running.");
-					System.out.println("Resources left: " + numResources[0] + " " + numResources[1] + 
-							" " + numResources[2]);
+					//System.out.println(_getName() + " is running.");
+					//System.out.println("Resources left: " + numResources[0] + " " + numResources[1] + 
+					//		" " + numResources[2]);
 					numResources[0] -= getRequiredResourceA();
 					numResources[1] -= getRequiredResourceB();
 					numResources[2] -= getRequiredResourceC();
+					setCurrentResourceA(getRequiredResourceA());
+					setCurrentResourceB(getRequiredResourceB());
+					setCurrentResourceC(getRequiredResourceC());
 					try {
 						Thread.sleep(1000 * getBurstTime());
 					} catch (InterruptedException e) {
 					}
-					System.out.println(_getName() + " is finished. Returning resources.");
-					System.out.println("Resources: " + numResources[0] + " " + numResources[1] + 
-							" " + numResources[2]);
+					//System.out.println(_getName() + " is finished. Returning resources.");
+					//System.out.println("Resources: " + numResources[0] + " " + numResources[1] + 
+					//		" " + numResources[2]);
 					numResources[0] += getRequiredResourceA();
 					numResources[1] += getRequiredResourceB();
 					numResources[2] += getRequiredResourceC();
+					setCurrentResourceA(0);
+					setCurrentResourceB(0);
+					setCurrentResourceC(0);
 				}
-				else {
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-					}
-					System.out.println(_getName() + " is currently waiting for resources.");
-				}
+//				else {
+//					System.out.println(_getName() + " is currently waiting for resources.");
+//				}
 		}
 	}
 }

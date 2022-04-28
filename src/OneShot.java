@@ -1,7 +1,7 @@
+import java.util.concurrent.TimeUnit;
 
 public class OneShot {
-	//public static int[] numResources = {8, 7, 8};
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		int[] numResources = {8,7,8};
 		
 		MultithreadProcess p1 = new MultithreadProcess("p1", 3, 6, 7, 10, numResources);
@@ -14,5 +14,33 @@ public class OneShot {
 		p4.start();
 		MultithreadProcess p5 = new MultithreadProcess("p5", 2, 1, 5, 8, numResources);
 		p5.start();
+		
+		while(true) {
+			TimeUnit.SECONDS.sleep(2);
+			System.out.println("Available Resources:| " + numResources[0] + " | " + numResources[1] + " | " + numResources[2]+ " | ");
+			System.out.println("------------------------------------------------");
+			System.out.println("                       CURRENT       REQUIRED");
+			System.out.println("Process 1:          | " + p1.getCurrentResourceA() + " | " + p1.getCurrentResourceB() 
+					+ " | " + p1.getCurrentResourceC() + " |" + "  | " + p1.getRequiredResourceA() 
+					+ " | " + p1.getRequiredResourceB() + " | " + p1.getRequiredResourceC() + " | ");
+			System.out.println("------------------------------------------------");
+			System.out.println("Process 2:          | " + p2.getCurrentResourceA() + " | " + p2.getCurrentResourceB() 
+					+ " | " + p2.getCurrentResourceC() + " |" + "  | " + p2.getRequiredResourceA() 
+						+ " | " + p2.getRequiredResourceB() + " | " + p2.getRequiredResourceC() + " | ");
+			System.out.println("------------------------------------------------");
+			System.out.println("Process 3:          | " + p3.getCurrentResourceA() + " | " + p3.getCurrentResourceB() 
+					+ " | " + p3.getCurrentResourceC() + " |" + "  | " + p3.getRequiredResourceA() 
+						+ " | " + p3.getRequiredResourceB() + " | " + p3.getRequiredResourceC() + " | ");
+			System.out.println("------------------------------------------------");
+			System.out.println("Process 4:          | " + p4.getCurrentResourceA() + " | " + p4.getCurrentResourceB() 
+					+ " | " + p4.getCurrentResourceC() + " |" + "  | " + p4.getRequiredResourceA() 
+						+ " | " + p4.getRequiredResourceB() + " | " + p4.getRequiredResourceC() + " | ");
+			System.out.println("------------------------------------------------");
+			System.out.println("Process 5:          | " + p5.getCurrentResourceA() + " | " + p5.getCurrentResourceB() 
+					+ " | " + p5.getCurrentResourceC() + " |" + "  | " + p5.getRequiredResourceA() 
+						+ " | " + p5.getRequiredResourceB() + " | " + p5.getRequiredResourceC() + " | ");
+			System.out.println("------------------------------------------------");
+			System.out.println();
+		}
 	}
 }
