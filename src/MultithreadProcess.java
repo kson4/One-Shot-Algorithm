@@ -91,11 +91,22 @@ public class MultithreadProcess extends Thread {
 	}
 	
 	public void setStatus(int status) {
+		// 0 is waiting
+		// 1 is running
 		this.status = status;
 	}
 	
 	public void _setName(String name) {
 		this.name = name;
+	}
+	
+	public void printStatus() {
+		if (getStatus() == 0) {
+			System.out.println(_getName() + " Status: Waiting...");
+		}
+		else if (getStatus() == 1) {
+			System.out.println(_getName() + " Status: Running");
+		}
 	}
 	
 	public void run() {
@@ -107,7 +118,7 @@ public class MultithreadProcess extends Thread {
 		}
 		while(true) {
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 			}
 			if (numResources[0] >= getRequiredResourceA() &&
@@ -116,9 +127,11 @@ public class MultithreadProcess extends Thread {
 					//System.out.println(_getName() + " is running.");
 					//System.out.println("Resources left: " + numResources[0] + " " + numResources[1] + 
 					//		" " + numResources[2]);
+				
 					numResources[0] -= getRequiredResourceA();
 					numResources[1] -= getRequiredResourceB();
 					numResources[2] -= getRequiredResourceC();
+					setStatus(1);
 					setCurrentResourceA(getRequiredResourceA());
 					setCurrentResourceB(getRequiredResourceB());
 					setCurrentResourceC(getRequiredResourceC());
@@ -132,6 +145,9 @@ public class MultithreadProcess extends Thread {
 					numResources[0] += getRequiredResourceA();
 					numResources[1] += getRequiredResourceB();
 					numResources[2] += getRequiredResourceC();
+					setCurrentResourceA(0);
+					setCurrentResourceB(0);
+					setCurrentResourceC(0);
 					setCurrentResourceA(0);
 					setCurrentResourceB(0);
 					setCurrentResourceC(0);
