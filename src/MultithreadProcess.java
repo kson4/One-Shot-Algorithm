@@ -157,9 +157,6 @@ public class MultithreadProcess extends Thread {
 				System.out.println(_getName() + " " + getCurrentResourceA());
 				setStatus(0);
 			}
-//			else {
-//				System.out.println(_getName() + " is currently waiting for resources.");
-//			}
 		}
 	}
 }
