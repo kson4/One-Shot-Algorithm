@@ -75,15 +75,15 @@ public class MultithreadProcess extends Thread {
 	}
 	
 	public void setCurrentResourceA(int currentResourceA) {
-		this.currentResourceA = requiredResourceA;
+		this.currentResourceA = currentResourceA;
 	}
 	
 	public void setCurrentResourceB(int currentResourceB) {
-		this.currentResourceB = requiredResourceB;
+		this.currentResourceB = currentResourceB;
 	}
 	
 	public void setCurrentResourceC(int currentResourceC) {
-		this.currentResourceC = requiredResourceC;
+		this.currentResourceC = currentResourceC;
 	}
 	
 	public void setBurstTime(int burstTime) {
@@ -123,7 +123,9 @@ public class MultithreadProcess extends Thread {
 		while(true) {
 			try {
 				Thread.sleep(2000);
-			} catch (InterruptedException e) {
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
 			if (numResources[0] >= getRequiredResourceA() &&
 				numResources[1] >= getRequiredResourceB() &&
@@ -144,64 +146,20 @@ public class MultithreadProcess extends Thread {
 					Thread.sleep(1000 * getBurstTime());
 				} catch (InterruptedException e) {
 				}
-				//System.out.println(_getName() + " is finished. Returning resources.");
-				//System.out.println("Resources: " + numResources[0] + " " + numResources[1] + 
-				//		" " + numResources[2]);
-				numResources[0] += getRequiredResourceA();
-				numResources[1] += getRequiredResourceB();
-				numResources[2] += getRequiredResourceC();
-				setCurrentResourceA(0);
-				setCurrentResourceB(0);
-				setCurrentResourceC(0);
-				setCurrentResourceA(0);
-				setCurrentResourceB(0);
-				setCurrentResourceC(0);
-				setStatus(0);
-			}
-			else if (getStatus() == 0) {
-				if (numResources[0] >= getRequiredResourceA()) {
-					numResources[0] -= getRequiredResourceA();
-					setCurrentResourceA(getRequiredResourceA());
-				}
-				else {
-					setCurrentResourceA(numResources[0]);
-					numResources[0] = 0;
-				}
-				
-				if (numResources[1] >= getRequiredResourceB()) {
-					numResources[1] -= getRequiredResourceB();
-					setCurrentResourceB(getRequiredResourceB());
-				}
-				else {
-					setCurrentResourceB(numResources[1]);
-					numResources[1] = 0;
-				}
-				
-				if (numResources[2] >= getRequiredResourceC()) {
-					numResources[2] -= getRequiredResourceC();
-					setCurrentResourceC(getRequiredResourceC());
-				}
-				else {
-					setCurrentResourceC(numResources[2]);
-					numResources[2] = 0;
-				}
-				setStatus(2);
-			}
-			else if (getStatus() == 2 && 
-					(numResources[0] < getRequiredResourceA() - getCurrentResourceA() &&
-					 numResources[1] < getRequiredResourceB() - getCurrentResourceB() &&
-					 numResources[2] < getRequiredResourceC() - getCurrentResourceC())) {
+				System.out.println(_getName() + " " + getCurrentResourceA());
+
 				numResources[0] += getCurrentResourceA();
 				numResources[1] += getCurrentResourceB();
 				numResources[2] += getCurrentResourceC();
 				setCurrentResourceA(0);
 				setCurrentResourceB(0);
 				setCurrentResourceC(0);
+				System.out.println(_getName() + " " + getCurrentResourceA());
 				setStatus(0);
 			}
-//				else {
-//					System.out.println(_getName() + " is currently waiting for resources.");
-//				}
+//			else {
+//				System.out.println(_getName() + " is currently waiting for resources.");
+//			}
 		}
 	}
 }
