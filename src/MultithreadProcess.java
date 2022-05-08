@@ -1,3 +1,4 @@
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 public class MultithreadProcess extends Thread {
@@ -10,7 +11,10 @@ public class MultithreadProcess extends Thread {
 	private int currentResourceC;
 	private int burstTime;
 	private int status;
+	private boolean canRun;
 	private int[] numResources;
+
+	static Semaphore readwrite = new Semaphore(1);
 	
 	public MultithreadProcess(String name, int requiredResourceA, int requiredResourceB, 
 							  int requiredResourceC, int burstTime, int[] numResources) {
@@ -23,6 +27,7 @@ public class MultithreadProcess extends Thread {
 		this.currentResourceC = 0;
 		this.burstTime = burstTime;
 		this.status = 0;
+		this.canRun = false;
 		this.numResources = numResources;
 	}
 
@@ -56,6 +61,10 @@ public class MultithreadProcess extends Thread {
 	
 	public int getStatus() {
 		return status;
+	}
+	
+	public boolean getCanRun() {
+		return canRun;
 	}
 	
 	public String _getName() {
@@ -93,12 +102,15 @@ public class MultithreadProcess extends Thread {
 	public void setStatus(int status) {
 		// 0 is waiting
 		// 1 is running
-		// 2 is requesting
 		this.status = status;
 	}
 	
 	public void _setName(String name) {
 		this.name = name;
+	}
+	
+	public void setCanRun(boolean status) {
+		this.canRun = status;
 	}
 	
 	public void printStatus() {
@@ -108,9 +120,32 @@ public class MultithreadProcess extends Thread {
 		else if (getStatus() == 1) {
 			System.out.println(_getName() + " Status: Running");
 		}
-		else if (getStatus() == 2) {
-			System.out.println(_getName() + " Status: Holding Resources~");
-		}
+	}
+	
+	public boolean checkAvailability() {
+		return (numResources[0] >= (getRequiredResourceA() - getCurrentResourceA()) &&
+					numResources[1] >= (getRequiredResourceB() - getCurrentResourceB()) &&
+					numResources[2] >= (getRequiredResourceC() - getCurrentResourceC()));
+	}
+	
+	public void addResources() {
+		numResources[0] -= getRequiredResourceA();
+		numResources[1] -= getRequiredResourceB();
+		numResources[2] -= getRequiredResourceC();
+		setCurrentResourceA(getRequiredResourceA());
+		setCurrentResourceB(getRequiredResourceB());
+		setCurrentResourceC(getRequiredResourceC());
+		setCanRun(true);
+	}
+	
+	public void releaseResources() {
+		numResources[0] += getRequiredResourceA();
+		numResources[1] += getRequiredResourceB();
+		numResources[2] += getRequiredResourceC();
+		setCurrentResourceA(0);
+		setCurrentResourceB(0);
+		setCurrentResourceC(0);
+		setCanRun(false);
 	}
 	
 	public void run() {
@@ -121,40 +156,57 @@ public class MultithreadProcess extends Thread {
 			e.printStackTrace();
 		}
 		while(true) {
+			// get read/write permission
 			try {
-				Thread.sleep(2000);
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			if (numResources[0] >= getRequiredResourceA() &&
-				numResources[1] >= getRequiredResourceB() &&
-				numResources[2] >= getRequiredResourceC()) {
-				
-				//System.out.println(_getName() + " is running.");
-				//System.out.println("Resources left: " + numResources[0] + " " + numResources[1] + 
-				//		" " + numResources[2]);
-			
-				numResources[0] -= getRequiredResourceA();
-				numResources[1] -= getRequiredResourceB();
-				numResources[2] -= getRequiredResourceC();
-				setStatus(1);
-				setCurrentResourceA(getRequiredResourceA());
-				setCurrentResourceB(getRequiredResourceB());
-				setCurrentResourceC(getRequiredResourceC());
+				readwrite.acquire();
 				try {
+					// once permission is received, check to see if there are enough
+					// resources to run
+					if (checkAvailability()) {
+						// if there are enough resources to run obtain the resources
+						addResources();
+					}
+				}
+				// release mutex lock
+				finally {
+					readwrite.release();
+				}
+			} catch (InterruptedException e) {
+			}
+			
+			// check to see if process has enough resources
+			// if a process has enough resources -> run
+			if (getCanRun()) {
+				// set status of process to run -> (1)
+				setStatus(1);
+				try {
+					// run the resource depending on its burst time
 					Thread.sleep(1000 * getBurstTime());
 				} catch (InterruptedException e) {
 				}
-				System.out.println(_getName() + " " + getCurrentResourceA());
-
-				numResources[0] += getCurrentResourceA();
-				numResources[1] += getCurrentResourceB();
-				numResources[2] += getCurrentResourceC();
-				setCurrentResourceA(0);
-				setCurrentResourceB(0);
-				setCurrentResourceC(0);
-				System.out.println(_getName() + " " + getCurrentResourceA());
+				
+				// once process is done running, it must release allocated resources
+				// attempt to obtain read/write permission
+				try {
+					readwrite.acquire();
+					// once permission is obtain, release allocated resources
+					try {
+						releaseResources();
+					}
+					// release permission
+					finally {
+						readwrite.release();
+					}
+				} catch (InterruptedException e) {
+				}
+				
+				// small buffer to prevent starvation
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+				}
+				
+				// set process status to waiting -> (0)
 				setStatus(0);
 			}
 		}

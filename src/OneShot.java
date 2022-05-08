@@ -2,18 +2,17 @@ import java.util.concurrent.TimeUnit;
 
 public class OneShot {
 	public static void main(String[] args) throws InterruptedException {
-		int[] numResources = {8,7,8};
-		//int[] numResources = {3,10,7};
+		int[] numResources = {15,15,15};
 		
-		MultithreadProcess p1 = new MultithreadProcess("Process 1", 3, 6, 7, 10, numResources);
+		MultithreadProcess p1 = new MultithreadProcess("Process 1", 3, 6, 7, 1, numResources);
 		p1.start();
-		MultithreadProcess p2 = new MultithreadProcess("Process 2", 1, 5, 6, 3, numResources);
+		MultithreadProcess p2 = new MultithreadProcess("Process 2", 1, 5, 6, 2, numResources);
 		p2.start();
-		MultithreadProcess p3 = new MultithreadProcess("Process 3", 4, 2, 2, 5, numResources);
+		MultithreadProcess p3 = new MultithreadProcess("Process 3", 4, 2, 2, 3, numResources);
 		p3.start();
-		MultithreadProcess p4 = new MultithreadProcess("Process 4", 6, 3, 3, 6, numResources);
+		MultithreadProcess p4 = new MultithreadProcess("Process 4", 6, 3, 3, 2, numResources);
 		p4.start();
-		MultithreadProcess p5 = new MultithreadProcess("Process 5", 2, 1, 5, 8, numResources);
+		MultithreadProcess p5 = new MultithreadProcess("Process 5", 2, 1, 5, 3, numResources);
 		p5.start();
 		
 		while(true) {
