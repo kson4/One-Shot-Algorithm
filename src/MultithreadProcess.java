@@ -13,8 +13,9 @@ public class MultithreadProcess extends Thread {
 	private int status;
 	private boolean canRun;
 	private int[] numResources;
+	private int numRunned;
 
-	static Semaphore readwrite = new Semaphore(1);
+	static Semaphore readWrite = new Semaphore(1);
 	
 	public MultithreadProcess(String name, int requiredResourceA, int requiredResourceB, 
 							  int requiredResourceC, int burstTime, int[] numResources) {
@@ -29,6 +30,7 @@ public class MultithreadProcess extends Thread {
 		this.status = 0;
 		this.canRun = false;
 		this.numResources = numResources;
+		this.numRunned = 0;
 	}
 
 	public int getRequiredResourceA() {
@@ -65,6 +67,10 @@ public class MultithreadProcess extends Thread {
 	
 	public boolean getCanRun() {
 		return canRun;
+	}
+	
+	public int getNumRunned() {
+		return numRunned;
 	}
 	
 	public String _getName() {
@@ -113,6 +119,14 @@ public class MultithreadProcess extends Thread {
 		this.canRun = status;
 	}
 	
+	public void setNumRunned(int num) {
+		this.numRunned = num;
+	}
+	
+	public void incrementNumRunned() {
+		setNumRunned(getNumRunned() + 1);
+	}
+	
 	public void printStatus() {
 		if (getStatus() == 0) {
 			System.out.println(_getName() + " Status: Waiting...");
@@ -135,6 +149,7 @@ public class MultithreadProcess extends Thread {
 		setCurrentResourceA(getRequiredResourceA());
 		setCurrentResourceB(getRequiredResourceB());
 		setCurrentResourceC(getRequiredResourceC());
+		incrementNumRunned();
 		setCanRun(true);
 	}
 	
@@ -158,7 +173,7 @@ public class MultithreadProcess extends Thread {
 		while(true) {
 			// get read/write permission
 			try {
-				readwrite.acquire();
+				readWrite.acquire();
 				try {
 					// once permission is received, check to see if there are enough
 					// resources to run
@@ -169,7 +184,7 @@ public class MultithreadProcess extends Thread {
 				}
 				// release mutex lock
 				finally {
-					readwrite.release();
+					readWrite.release();
 				}
 			} catch (InterruptedException e) {
 			}
@@ -188,14 +203,14 @@ public class MultithreadProcess extends Thread {
 				// once process is done running, it must release allocated resources
 				// attempt to obtain read/write permission
 				try {
-					readwrite.acquire();
+					readWrite.acquire();
 					// once permission is obtain, release allocated resources
 					try {
 						releaseResources();
 					}
 					// release permission
 					finally {
-						readwrite.release();
+						readWrite.release();
 					}
 				} catch (InterruptedException e) {
 				}
